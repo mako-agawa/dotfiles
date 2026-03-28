@@ -1,0 +1,6 @@
+
+
+
+export NB_COLOR_THEME="${NB_COLOR_THEME:-blacklight}" # Set by `nb` • Fri Mar  6 22:41:56 JST 2026
+
+export EDITOR="nvim" # Set by `nb` • Fri Mar  6 22:58:19 JST 2026

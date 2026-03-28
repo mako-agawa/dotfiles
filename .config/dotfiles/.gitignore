@@ -1,0 +1,18 @@
+# Secrets
+.config/zsh/hidden/
+
+# History & sessions
+.zsh_history
+.zsh_sessions/
+.bash_history
+.mysql_history
+.psql_history
+.node_repl_history
+.irb_history
+
+# macOS
+.DS_Store
+
+# Claude
+.claude.json
+.claude.json.backup

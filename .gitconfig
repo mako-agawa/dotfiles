@@ -1,0 +1,21 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Makoto_Agawa
+	email = 51506765+mako-agawa@users.noreply.github.com
+[http]
+	lowSpeedLimit = 0
+	lowSpeedTime = 999999
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	cm = commit -m
+	lg = log --oneline --graph
+	df = diff
+	ps = push
+	pl = pull
