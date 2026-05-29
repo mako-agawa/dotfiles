@@ -2,14 +2,14 @@
 # Shell Environment & Language Tools
 # =================================================
 
-# Ruby
+# --- Ruby ---
 eval "$(rbenv init - zsh)"
 
-# Editor (Neovimを優先)
+# --- Editor (Neovim を優先) ---
 export VISUAL=nvim
 export EDITOR=nvim
 
-# Node / npm / pnpm
+# --- Node / npm / pnpm ---
 export PATH=$(npm prefix -g)/bin:$PATH
 export PATH="/usr/local/lib/node_modules/shadcn-ui/bin:$PATH"
 export PNPM_HOME="$HOME/Library/pnpm"
@@ -18,36 +18,43 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
-# MySQL
-export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
+# --- nvm (Node Version Manager) ---
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# PostgreSQL
+# --- Bun ---
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# --- Database CLI (MySQL / PostgreSQL) ---
+export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
-# Flutter
+# --- Flutter ---
 export PATH="$HOME/development/flutter/bin:$PATH"
 
-# Java
+# --- Java ---
 export JAVA_HOME="/opt/homebrew/opt/openjdk@21"
 export PATH="$JAVA_HOME/bin:$PATH"
 export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
 
-# Rust / Cargo
+# --- Rust / Cargo ---
 source "$HOME/.cargo/env"
 
-# Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-[ -s "/Users/makotoagawa/.bun/_bun" ] && source "/Users/makotoagawa/.bun/_bun"
+# --- Antigravity ---
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
 
 # =================================================
 # CLI Tools & Plugins
 # =================================================
 
-# Sheldon (Plugin Manager)
+# --- Sheldon (Plugin Manager) ---
 eval "$(sheldon source)"
 
-# Zeno (Completion/Snippets)
+# --- Zeno (Completion / Snippets) ---
 export ZENO_HOME=~/.config/zeno
 if [[ -n $ZENO_LOADED ]]; then
   bindkey '^i' zeno-completion
@@ -56,14 +63,85 @@ if [[ -n $ZENO_LOADED ]]; then
   bindkey '^r' zeno-smart-history-selection
 fi
 
-# Starship (Prompt)
+# --- Starship (Prompt) ---
 eval "$(starship init zsh)"
 
+
 # =================================================
-# Custom Functions (nb wrapper)
+# Aliases
 # =================================================
 
-# nba: Add a note with article title and URL
+# --- ディレクトリ移動 ---
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# --- ファイル一覧 ---
+alias ll='ls -lah'
+alias la='ls -a'
+alias lt='ls -lahtr'                               # 更新日時順(最新が下)
+
+# --- エディタ ---
+alias v='nvim'
+alias vi='nvim'
+
+# --- Python ---
+alias python='python3'
+alias pip='pip3'
+
+# --- 汎用ショートカット ---
+alias c='clear'
+alias h='history | tail -30'
+alias mk='mkdir -p'                                # 深い階層も一発作成
+alias ports='lsof -i -P -n | grep LISTEN'          # 使用中のポート確認
+
+# --- Git ---
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gl='git log --oneline --graph'
+alias gd='git diff'
+alias gco='git checkout'
+alias gb='git branch'
+alias gsb='git submodule'
+
+# --- Dotfiles 管理 ---
+alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+# --- Docker Compose ---
+alias dc='docker compose'
+alias dcu='docker compose up'
+alias dcud='docker compose up -d'                  # バックグラウンド起動
+alias dcd='docker compose down'
+alias dcb='docker compose build'
+alias dcl='docker compose logs -f'                 # ログ追跡
+
+# --- Rails 開発コマンド (web サービス前提) ---
+alias dcr='docker compose run --rm web bundle exec'
+alias dcrails='docker compose run --rm web bundle exec rails'
+alias dcrake='docker compose run --rm web bundle exec rake'
+alias dcsh='docker compose exec web bash'          # 起動中の web コンテナに入る
+
+# --- 個別プロジェクトの DB 接続 ---
+alias ecdb='docker exec -it ec_training_db psql -U ecuser -d ecdb'
+
+# --- cmux ブラウザブックマーク ---
+alias c-yt='cmux browser open "https://www.youtube.com/"'
+alias c-gh='cmux browser open "https://github.com/"'
+alias c-qi='cmux browser open "https://qiita.com/"'
+alias c-aws='cmux browser open "https://console.aws.amazon.com/"'
+alias c-ver='cmux browser open "https://vercel.com/dashboard"'
+alias c-gem='cmux browser open "https://gemini.google.com/"'
+
+
+# =================================================
+# Custom Functions
+# =================================================
+
+# --- nba: Add a note with article title and URL ---
 function nba() {
   if [ $# -lt 1 ]; then
     echo "Usage: nba <url>           # Auto-fetch title"
@@ -97,7 +175,7 @@ function nba() {
   echo "Note created: [${title}](${url})"
 }
 
-# nbq: Search notes and select with fzf preview
+# --- nbq: Search notes and select with fzf preview ---
 function nbq() {
   if [ -z "$1" ]; then
     echo "Usage: nbq <search query>"
@@ -134,69 +212,63 @@ function nbq() {
   fi
 }
 
-# =================================================
-# Dotfiles Management
-# =================================================
-alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+# --- reminder: macOS リマインダーに追加 ---
+# 使い方: reminder "タイトル" ["メモ"] "YYYY/MM/DD" ["HH:MM"] ["リスト名"]
+reminder() {
+  local title="$1"
+  local memo="${2:-}"
+  local date="$3"
+  local time="${4:-}"
+  local list="${5:-一般}"
 
-# =================================================
-# Aliases
-# =================================================
+  if [[ -z "$title" || -z "$date" ]]; then
+    echo "使い方: reminder \"タイトル\" [\"メモ\"] \"YYYY/MM/DD\" [\"HH:MM\"] [\"カテゴリ\"]"
+    return 1
+  fi
 
-# --- ディレクトリ移動 ---
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
+  local due_date
+  if [[ -n "$time" ]]; then
+    due_date="${date} ${time}"
+  else
+    due_date="${date} 09:00"
+  fi
 
-# --- ファイル一覧（ls → eza） ---
-alias ll='ls -lah'
-alias la='ls -a'
-alias lt='ls -lahtr'          # 更新日時順（最新が下）
+  osascript -e "
+tell application \"Reminders\"
+  tell list \"${list}\"
+    make new reminder with properties {name:\"${title}\", body:\"${memo}\", due date:date \"${due_date}\"}
+  end tell
+end tell"
+  echo "追加しました: ${title} (${due_date}) [${list}]"
+}
 
-# --- Git ---
-alias g='git'
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit -m'
-alias gp='git push'
-alias gl='git log --oneline --graph'
-alias gd='git diff'
-alias gco='git checkout'
-alias gb='git branch'
-alias gpl='git pull'
+# --- qiita-post: Qiita 投稿 ---
+qiita-post() {
+  local token=$(grep QIITA_TOKEN ~/Documents/05_vim/qiita-sync/.env | cut -d= -f2)
+  QIITA_TOKEN="$token" bun run ~/Documents/05_vim/qiita-sync/post.ts "$1"
+}
 
-# --- エディタ ---
-alias v='nvim'
-alias vi='nvim'
 
-# --- よく使うコマンド短縮 ---
-alias c='clear'
-alias h='history | tail -30'
-alias mk='mkdir -p'           # 深い階層も一発作成
-alias ports='lsof -i -P -n | grep LISTEN'  # 使用中のポート確認
-
-# cmux用のお気に入り（ブックマーク）設定
-# cmuxのブラウザ起動コマンドに合わせて修正
-alias c-yt='cmux browser open "https://www.youtube.com/"'
-alias c-gh='cmux browser open "https://github.com/"'
-alias c-qi='cmux browser open "https://qiita.com/"'
-alias c-aws='cmux browser open "https://console.aws.amazon.com/"'
-alias c-ver='cmux browser open "https://vercel.com/dashboard"'
-
-# Gemini用
-alias c-gem='cmux browser open "https://gemini.google.com/"'
 # =================================================
 # Extra Configurations & Hidden Secrets
 # =================================================
 
-# 1. 他のzsh設定を読み込む
+# --- 他の zsh 設定を読み込む ---
 if [ -f "$HOME/.config/zsh/.zshrc" ]; then
   source "$HOME/.config/zsh/.zshrc"
 fi
 
-# 2. hiddenディレクトリ内の機密設定を自動読み込み (Rails Master Keyなど)
+# --- hidden ディレクトリ内の機密設定 (Rails Master Key など) ---
 if [ -d "$HOME/.config/zsh/hidden" ]; then
   for file in "$HOME/.config/zsh/hidden"/*.zsh; do
     source "$file"
   done
 fi
+
+. "$HOME/.local/bin/env"
+
+# Hermes Agent — ensure ~/.local/bin is on PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Obsidian _daily_log の raw を手動整理（launchd と同じスクリプト）
+alias obs-worker="$HOME/.claude/scripts/daily-obsidian-organize.sh"
